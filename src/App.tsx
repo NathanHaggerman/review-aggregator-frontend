@@ -1,11 +1,15 @@
+import { Container, Typography } from "@mui/material";
+
 import ReviewList from "./components/ReviewList";
 
 function App() {
   return (
-    <div className="max-w-2xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">Review Aggregator</h1>
+    <Container maxWidth="md" sx={{ mt: 8, px: 2 }}>
+      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+        Review Aggregator
+      </Typography>
       <ReviewList />
-    </div>
+    </Container>
   );
 }
 

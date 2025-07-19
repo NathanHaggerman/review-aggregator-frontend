@@ -1,3 +1,15 @@
+import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 import api from "../api";
@@ -8,6 +20,7 @@ export default function ReviewList() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRating, setSelectedRating] = useState("all");
 
   useEffect(() => {
     api
@@ -23,23 +36,53 @@ export default function ReviewList() {
       });
   }, []);
 
-  if (loading) return <p className="text-gray-500">Loading reviews...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const filteredReviews =
+    selectedRating === "all"
+      ? reviews
+      : reviews.filter((review) => review.rating === Number(selectedRating));
+
+  if (loading) return <CircularProgress />;
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <div className="space-y-4">
-      {reviews.map((review) => (
-        <div key={review.id} className="p-4 border rounded shadow-sm">
-          <div className="flex justify-between mb-2">
-            <h3 className="font-semibold">{review.author}</h3>
-            <span className="text-sm text-gray-500">
-              {review.createdAt.slice(0, 10)}
-            </span>
-          </div>
-          <p className="mb-2">{review.content}</p>
-          <span className="text-yellow-500">Rating: {review.rating}</span>
-        </div>
+    <Box sx={{ maxWidth: 800, mx: "auto", mt: 4, px: 2 }}>
+      {/* Dropdown Filter */}
+      <FormControl fullWidth sx={{ mb: 4 }}>
+        <InputLabel id="rating-select-label">Filter by Rating</InputLabel>
+        <Select
+          labelId="rating-select-label"
+          value={selectedRating}
+          label="Filter by Rating"
+          onChange={(e) => setSelectedRating(e.target.value)}
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="5">5 Stars</MenuItem>
+          <MenuItem value="4">4 Stars</MenuItem>
+          <MenuItem value="3">3 Stars</MenuItem>
+          <MenuItem value="2">2 Stars</MenuItem>
+          <MenuItem value="1">1 Star</MenuItem>
+        </Select>
+      </FormControl>
+
+      {/* Review Cards */}
+      {filteredReviews.map((review) => (
+        <Card key={review.id} sx={{ mb: 3 }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" mb={1}>
+              <Typography variant="h6">{review.author}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {review.createdAt.slice(0, 10)}
+              </Typography>
+            </Box>
+            <Typography variant="body1" paragraph>
+              {review.content}
+            </Typography>
+            <Typography color="warning.main">
+              Rating: {review.rating}
+            </Typography>
+          </CardContent>
+        </Card>
       ))}
-    </div>
+    </Box>
   );
 }
